@@ -14,31 +14,42 @@ import java.util.Set;
  * Created by charsyam on 2015. 12. 27..
  */
 public class CliOptions {
-    ImmutableSet<String> options = ImmutableSet.of(
-            "-h",
-            "-c"
-            );
-
     private String hosts = "localhost:2181";
+    private String serviceCode = null;
     private String cmd = "";
 
     public void parse(String [] args) throws Exception {
-        if (args.length < 2) {
+        if (args.length < 3) {
             throw new Exception("Invalid Parameters");
         }
 
-        int cmdIdx = 1;
-        boolean hasHost = StringUtils.equals(args[1], "-h");
+        int cmdIdx = 2;
+        boolean hasHost = false;
+        boolean hasServiceCode = false;
 
-        if (hasHost && args.length < 4) {
+        String arg = args[0];
+        if (StringUtils.equals("-h", arg)) {
+            hasHost = true;
+            hosts = args[1];
+        } else if (StringUtils.equals("-c", arg)) {
+            hasServiceCode = true;
+            serviceCode = args[1];
+        }
+
+        arg = args[2];
+        if (StringUtils.equals("-h", arg)) {
+            hasHost = true;
+            hosts = args[3];
+            cmdIdx = 4;
+        } else if (StringUtils.equals("-c", arg)) {
+            hasServiceCode = true;
+            serviceCode = args[3];
+            cmdIdx = 4;
+        }
+
+        if (serviceCode == null) {
             throw new Exception("Invalid Parameters");
         }
-
-        if (hasHost) {
-            hosts = args[2];
-            cmdIdx = 3;
-        }
-
 
         StringBuilder sb = new StringBuilder();
         sb.append(args[cmdIdx]);
@@ -56,5 +67,9 @@ public class CliOptions {
 
     public String getCmd() {
         return cmd;
+    }
+
+    public String getServiceCode() {
+        return serviceCode;
     }
 }

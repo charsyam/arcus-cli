@@ -30,7 +30,7 @@ public class ArcusCli {
         this.arcusClient = ArcusClient.createArcusClient(arcusAdmin, serviceCode, new ConnectionFactoryBuilder());
     }
 
-    public void main(String [] args) {
+    public static void main(String [] args) {
         CliOptions options = new CliOptions();
         try {
             options.parse(args);
@@ -39,13 +39,26 @@ public class ArcusCli {
             return;
         }
 
-        ArcusCli cli = new ArcusCli(options.getHosts(), "00");
+        ArcusCli cli = new ArcusCli(options.getHosts(), options.getServiceCode());
         if (StringUtils.equalsIgnoreCase(options.getCmd(), "cluster_info")) {
-            Collection<SocketAddress> nodes = arcusClient.getAvailableServers();
+            Collection<SocketAddress> nodes = cli.arcusClient.getAvailableServers();
             int count = 0;
+            System.out.println("=========== Alive Node =============");
             for (SocketAddress node : nodes) {
-                System.out.println("node(" + i + ") -> " + node.toString());
+                System.out.println("node(" + count + ") -> " + node.toString());
+                count++;
             }
+
+            nodes = cli.arcusClient.getUnavailableServers();
+            count = 0;
+            System.out.println("=========== Dead Node =============");
+            for (SocketAddress node : nodes) {
+                System.out.println("node(" + count + ") -> " + node.toString());
+                count++;
+            }
+
+        } else {
+            System.out.println("Not Supported Command: " + options.getCmd());
         }
     }
 }
